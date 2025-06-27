@@ -50,10 +50,19 @@ class DDSRecord(models.Model):
 
     def clean(self):
         # Валидация логических связей
-        if self.category.type != self.type:
+        category = getattr(self, 'category', None)
+        subcategory = getattr(self, 'subcategory', None)
+        type_ = getattr(self, 'type', None)
+
+        if category and type_ and category.type_id != type_.id:
             raise ValidationError("Категория не принадлежит выбранному типу.")
-        if self.subcategory.category != self.category:
+
+        if subcategory and category and subcategory.category_id != category.id:
             raise ValidationError("Подкатегория не принадлежит выбранной категории.")
+        
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.created_at} — {self.type} — {self.amount}₽"

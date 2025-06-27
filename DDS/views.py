@@ -1,14 +1,10 @@
 from django.shortcuts import render
 from .models import DDSRecord, Status, Type, Category, SubCategory
 from.forms import TypeForm, StatusForm, CategoryForm, SubCategoryForm
-from django.db.models import Q
-from datetime import datetime
 from .forms import DDSRecordForm
 from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
 from django.urls import reverse_lazy
 
 
@@ -66,9 +62,6 @@ def dds_list(request):
         }
     }
     return render(request, 'dds/dds_list.html', context)
-
-
-from django.shortcuts import get_object_or_404
 
 
 def dds_edit(request, pk):
@@ -201,3 +194,8 @@ class SubCategoryDeleteView(DeleteView):
     model = SubCategoryForm
     template_name = 'dds/ref_confirm_delete.html'
     success_url = reverse_lazy('ref_subcategory_delete')
+
+
+# Домашняя страница для полей формы
+class RefsHomeView(TemplateView):
+    template_name = 'dds/refs_home.html'

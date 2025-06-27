@@ -7,6 +7,7 @@ urlpatterns = [
     path('create/', views.dds_create, name='dds_create'),
     path('edit/<int:pk>/', views.dds_edit, name='dds_edit'),
     path('delete/<int:pk>/', views.dds_delete, name='dds_delete'),
+    path('refs/', views.RefsHomeView.as_view(), name='refs_home'),
     path('refs/type/', views.TypeListView.as_view(), name='ref_type_list'),
     path('refs/type/create/', views.TypeCreateView.as_view(), name='ref_type_create'),
     path('refs/type/<int:pk>/edit/', views.TypeUpdateView.as_view(), name='ref_type_edit'),
