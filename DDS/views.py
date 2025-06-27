@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import DDSRecord, Status, Type, Category, SubCategory
+from.forms import TypeForm, StatusForm, CategoryForm, SubCategoryForm
 from django.db.models import Q
 from datetime import datetime
 from .forms import DDSRecordForm
@@ -7,6 +8,8 @@ from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
 
 
 def dds_create(request):
@@ -86,3 +89,115 @@ def dds_delete(request, pk):
         record.delete()
         return redirect('dds_list')
     return render(request, 'dds/dds_confirm_delete.html', {'record': record})
+
+# Представления для справочников
+# Тип
+class TypeListView(ListView):
+    model = Type
+    template_name = 'dds/ref_list.html'
+    context_object_name = 'objects'
+    extra_context = {'title': 'Типы', 'model_name': 'type'}
+
+
+class TypeCreateView(CreateView):
+    model = Type
+    form_class = TypeForm
+    template_name = 'dds/ref_form.html'
+    success_url = reverse_lazy('ref_type_create')
+
+
+class TypeUpdateView(UpdateView):
+    model = Type
+    form_class = TypeForm
+    template_name = 'dds/ref_form.html'
+    success_url = reverse_lazy('ref_type_edit')
+
+
+class TypeDeleteView(DeleteView):
+    model = Type
+    template_name = 'dds/ref_confirm_delete.html'
+    success_url = reverse_lazy('ref_type_delete')
+
+
+# Статус
+class StatusListView(ListView):
+    model = Status
+    template_name = 'dds/ref_list.html'
+    context_object_name = 'objects'
+    extra_context = {'title': 'Статус', 'model_name': 'status'}
+
+
+class StatusCreateView(CreateView):
+    model = Status
+    form_class = StatusForm
+    template_name = 'dds/ref_form.html'
+    success_url = reverse_lazy('ref_status_create')
+
+
+class StatusUpdateView(UpdateView):
+    model = Status
+    form_class = StatusForm
+    template_name = 'dds/ref_form.html'
+    success_url = reverse_lazy('ref_status_edit')
+
+
+class StatusDeleteView(DeleteView):
+    model = StatusForm
+    template_name = 'dds/ref_confirm_delete.html'
+    success_url = reverse_lazy('ref_status_delete')
+
+
+# Категория
+class CategoryListView(ListView):
+    model = Category
+    template_name = 'dds/ref_list.html'
+    context_object_name = 'objects'
+    extra_context = {'title': 'Категория', 'model_name': 'category'}
+
+
+class CategoryCreateView(CreateView):
+    model = Category
+    form_class = CategoryForm
+    template_name = 'dds/ref_form.html'
+    success_url = reverse_lazy('ref_category_create')
+
+
+class CategoryUpdateView(UpdateView):
+    model = Category
+    form_class = CategoryForm
+    template_name = 'dds/ref_form.html'
+    success_url = reverse_lazy('ref_category_edit')
+
+
+class CategoryDeleteView(DeleteView):
+    model = CategoryForm
+    template_name = 'dds/ref_confirm_delete.html'
+    success_url = reverse_lazy('ref_category_delete')
+
+
+# Подкатегория
+class SubCategoryListView(ListView):
+    model = SubCategory
+    template_name = 'dds/ref_list.html'
+    context_object_name = 'objects'
+    extra_context = {'title': 'Подкатегория', 'model_name': 'subcategory'}
+
+
+class SubCategoryCreateView(CreateView):
+    model = SubCategory
+    form_class = SubCategoryForm
+    template_name = 'dds/ref_form.html'
+    success_url = reverse_lazy('ref_subcategory_create')
+
+
+class SubCategoryUpdateView(UpdateView):
+    model = SubCategory
+    form_class = SubCategoryForm
+    template_name = 'dds/ref_form.html'
+    success_url = reverse_lazy('ref_subcategory_edit')
+
+
+class SubCategoryDeleteView(DeleteView):
+    model = SubCategoryForm
+    template_name = 'dds/ref_confirm_delete.html'
+    success_url = reverse_lazy('ref_subcategory_delete')
