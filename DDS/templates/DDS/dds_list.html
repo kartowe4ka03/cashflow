@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ДДС — Список операций</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4">
+<h1>Движение денежных средств</h1>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col"><input type="date" name="date_from" value="{{ filters.date_from }}" class="form-control" placeholder="С даты"></div>
+    <div class="col"><input type="date" name="date_to" value="{{ filters.date_to }}" class="form-control" placeholder="По дату"></div>
+    <div class="col">
+        <select name="type" class="form-select">
+            <option value="">Тип</option>
+            {% for t in types %}
+                <option value="{{ t.id }}" {% if t.id|stringformat:"s" == filters.type %}selected{% endif %}>{{ t.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col">
+        <select name="status" class="form-select">
+            <option value="">Статус</option>
+            {% for s in statuses %}
+                <option value="{{ s.id }}" {% if s.id|stringformat:"s" == filters.status %}selected{% endif %}>{{ s.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col">
+        <select name="category" class="form-select">
+            <option value="">Категория</option>
+            {% for c in categories %}
+                <option value="{{ c.id }}" {% if c.id|stringformat:"s" == filters.category %}selected{% endif %}>{{ c.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col">
+        <select name="subcategory" class="form-select">
+            <option value="">Подкатегория</option>
+            {% for sc in subcategories %}
+                <option value="{{ sc.id }}" {% if sc.id|stringformat:"s" == filters.subcategory %}selected{% endif %}>{{ sc.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col">
+        <button type="submit" class="btn btn-primary">Фильтровать</button>
+    </div>
+</form>
+
+<table class="table table-bordered table-striped">
+    <thead>
+    <tr>
+        <th>Дата</th>
+        <th>Тип</th>
+        <th>Категория</th>
+        <th>Подкатегория</th>
+        <th>Статус</th>
+        <th>Сумма</th>
+        <th>Комментарий</th>
+        <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for r in records %}
+        <tr>
+            <td>{{ r.created_at }}</td>
+            <td>{{ r.type.name }}</td>
+            <td>{{ r.category.name }}</td>
+            <td>{{ r.subcategory.name }}</td>
+            <td>{{ r.status.name }}</td>
+            <td>{{ r.amount }}</td>
+            <td>{{ r.comment|default:"—" }}</td>
+            <td>
+                <a href="{% url 'dds_edit' r.pk %}" class="btn btn-sm btn-outline-primary">✏️</a>
+                <a href="{% url 'dds_delete' r.pk %}" class="btn btn-sm btn-outline-danger">🗑️</a>
+            </td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="7" class="text-center">Записей нет</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+</body>
+</html>

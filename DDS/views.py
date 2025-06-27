@@ -2,6 +2,23 @@ from django.shortcuts import render
 from .models import DDSRecord, Status, Type, Category, SubCategory
 from django.db.models import Q
 from datetime import datetime
+from .forms import DDSRecordForm
+from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
+
+def dds_create(request):
+    if request.method == 'POST':
+        form = DDSRecordForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('dds_list')
+    else:
+        form = DDSRecordForm()
+
+    return render(request, 'dds/dds_form.html', {'form': form})
 
 
 def dds_list(request):
@@ -46,3 +63,26 @@ def dds_list(request):
         }
     }
     return render(request, 'dds/dds_list.html', context)
+
+
+from django.shortcuts import get_object_or_404
+
+
+def dds_edit(request, pk):
+    record = get_object_or_404(DDSRecord, pk=pk)
+    if request.method == 'POST':
+        form = DDSRecordForm(request.POST, instance=record)
+        if form.is_valid():
+            form.save()
+            return redirect('dds_list')
+    else:
+        form = DDSRecordForm(instance=record)
+    return render(request, 'dds/dds_form.html', {'form': form, 'edit': True})
+
+
+def dds_delete(request, pk):
+    record = get_object_or_404(DDSRecord, pk=pk)
+    if request.method == 'POST':
+        record.delete()
+        return redirect('dds_list')
+    return render(request, 'dds/dds_confirm_delete.html', {'record': record})
