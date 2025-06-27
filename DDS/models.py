@@ -39,7 +39,7 @@ class SubCategory(models.Model):
         return f"{self.name} ({self.category.name})"
 
 
-class DdsRecord(models.Model):
+class DDSRecord(models.Model):
     created_at = models.DateField(default=timezone.now)
     status = models.ForeignKey(Status, on_delete=models.PROTECT)
     type = models.ForeignKey(Type, on_delete=models.PROTECT)
