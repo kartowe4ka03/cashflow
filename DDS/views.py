@@ -1,14 +1,23 @@
-from django.shortcuts import render
-from .models import DDSRecord, Status, Type, Category, SubCategory
-from.forms import TypeForm, StatusForm, CategoryForm, SubCategoryForm
-from .forms import DDSRecordForm
-from django.shortcuts import redirect
-from django.shortcuts import get_object_or_404
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import (
+    ListView, CreateView, UpdateView, DeleteView, TemplateView
+)
 from django.urls import reverse_lazy
 
+from .models import DDSRecord, Status, Type, Category, SubCategory
+from .forms import (
+    DDSRecordForm, TypeForm, StatusForm, CategoryForm, SubCategoryForm
+)
+
+# -----------------------------
+# Основные представления ДДС
+# -----------------------------
 
 def dds_create(request):
+    """
+    Представление для создания новой записи ДДС.
+    Отображает форму и сохраняет запись при успешной валидации.
+    """
     if request.method == 'POST':
         form = DDSRecordForm(request.POST)
         if form.is_valid():
@@ -21,11 +30,15 @@ def dds_create(request):
 
 
 def dds_list(request):
+    """
+    Главная страница со списком записей ДДС.
+    Поддерживает фильтрацию по дате, статусу, типу, категории и подкатегории.
+    """
     records = DDSRecord.objects.all().select_related(
         'type', 'status', 'category', 'subcategory'
     )
 
-    # Фильтрация
+    # Получение параметров фильтрации из GET-запроса
     type_id = request.GET.get('type')
     status_id = request.GET.get('status')
     category_id = request.GET.get('category')
@@ -33,6 +46,7 @@ def dds_list(request):
     date_from = request.GET.get('date_from')
     date_to = request.GET.get('date_to')
 
+    # Применение фильтров
     if type_id:
         records = records.filter(type_id=type_id)
     if status_id:
@@ -65,6 +79,9 @@ def dds_list(request):
 
 
 def dds_edit(request, pk):
+    """
+    Редактирование существующей записи ДДС.
+    """
     record = get_object_or_404(DDSRecord, pk=pk)
     if request.method == 'POST':
         form = DDSRecordForm(request.POST, instance=record)
@@ -77,15 +94,24 @@ def dds_edit(request, pk):
 
 
 def dds_delete(request, pk):
+    """
+    Удаление записи ДДС с подтверждением.
+    """
     record = get_object_or_404(DDSRecord, pk=pk)
     if request.method == 'POST':
         record.delete()
         return redirect('dds_list')
     return render(request, 'dds/dds_confirm_delete.html', {'record': record})
 
-# Представления для справочников
-# Тип
+
+# -----------------------------
+# Представления справочников
+# -----------------------------
+
+# ——— Типы ———
+
 class TypeListView(ListView):
+    """Список типов операций."""
     model = Type
     template_name = 'dds/ref_list.html'
     context_object_name = 'objects'
@@ -93,109 +119,131 @@ class TypeListView(ListView):
 
 
 class TypeCreateView(CreateView):
+    """Создание нового типа."""
     model = Type
     form_class = TypeForm
     template_name = 'dds/ref_form.html'
-    success_url = reverse_lazy('ref_type_create')
+    success_url = reverse_lazy('ref_type_list')
 
 
 class TypeUpdateView(UpdateView):
+    """Редактирование типа."""
     model = Type
     form_class = TypeForm
     template_name = 'dds/ref_form.html'
-    success_url = reverse_lazy('ref_type_edit')
+    success_url = reverse_lazy('ref_type_list')
 
 
 class TypeDeleteView(DeleteView):
+    """Удаление типа."""
     model = Type
     template_name = 'dds/ref_confirm_delete.html'
-    success_url = reverse_lazy('ref_type_delete')
+    success_url = reverse_lazy('ref_type_list')
 
 
-# Статус
+# ——— Статусы ———
+
 class StatusListView(ListView):
+    """Список статусов операций."""
     model = Status
     template_name = 'dds/ref_list.html'
     context_object_name = 'objects'
-    extra_context = {'title': 'Статус', 'model_name': 'status'}
+    extra_context = {'title': 'Статусы', 'model_name': 'status'}
 
 
 class StatusCreateView(CreateView):
+    """Создание нового статуса."""
     model = Status
     form_class = StatusForm
     template_name = 'dds/ref_form.html'
-    success_url = reverse_lazy('ref_status_create')
+    success_url = reverse_lazy('ref_status_list')
 
 
 class StatusUpdateView(UpdateView):
+    """Редактирование статуса."""
     model = Status
     form_class = StatusForm
     template_name = 'dds/ref_form.html'
-    success_url = reverse_lazy('ref_status_edit')
+    success_url = reverse_lazy('ref_status_list')
 
 
 class StatusDeleteView(DeleteView):
-    model = StatusForm
+    """Удаление статуса."""
+    model = Status
     template_name = 'dds/ref_confirm_delete.html'
-    success_url = reverse_lazy('ref_status_delete')
+    success_url = reverse_lazy('ref_status_list')
 
 
-# Категория
+# ——— Категории ———
+
 class CategoryListView(ListView):
+    """Список категорий."""
     model = Category
     template_name = 'dds/ref_list.html'
     context_object_name = 'objects'
-    extra_context = {'title': 'Категория', 'model_name': 'category'}
+    extra_context = {'title': 'Категории', 'model_name': 'category'}
 
 
 class CategoryCreateView(CreateView):
+    """Создание новой категории."""
     model = Category
     form_class = CategoryForm
     template_name = 'dds/ref_form.html'
-    success_url = reverse_lazy('ref_category_create')
+    success_url = reverse_lazy('ref_category_list')
 
 
 class CategoryUpdateView(UpdateView):
+    """Редактирование категории."""
     model = Category
     form_class = CategoryForm
     template_name = 'dds/ref_form.html'
-    success_url = reverse_lazy('ref_category_edit')
+    success_url = reverse_lazy('ref_category_list')
 
 
 class CategoryDeleteView(DeleteView):
-    model = CategoryForm
+    """Удаление категории."""
+    model = Category
     template_name = 'dds/ref_confirm_delete.html'
-    success_url = reverse_lazy('ref_category_delete')
+    success_url = reverse_lazy('ref_category_list')
 
 
-# Подкатегория
+# ——— Подкатегории ———
+
 class SubCategoryListView(ListView):
+    """Список подкатегорий."""
     model = SubCategory
     template_name = 'dds/ref_list.html'
     context_object_name = 'objects'
-    extra_context = {'title': 'Подкатегория', 'model_name': 'subcategory'}
+    extra_context = {'title': 'Подкатегории', 'model_name': 'subcategory'}
 
 
 class SubCategoryCreateView(CreateView):
+    """Создание новой подкатегории."""
     model = SubCategory
     form_class = SubCategoryForm
     template_name = 'dds/ref_form.html'
-    success_url = reverse_lazy('ref_subcategory_create')
+    success_url = reverse_lazy('ref_subcategory_list')
 
 
 class SubCategoryUpdateView(UpdateView):
+    """Редактирование подкатегории."""
     model = SubCategory
     form_class = SubCategoryForm
     template_name = 'dds/ref_form.html'
-    success_url = reverse_lazy('ref_subcategory_edit')
+    success_url = reverse_lazy('ref_subcategory_list')
 
 
 class SubCategoryDeleteView(DeleteView):
-    model = SubCategoryForm
+    """Удаление подкатегории."""
+    model = SubCategory
     template_name = 'dds/ref_confirm_delete.html'
-    success_url = reverse_lazy('ref_subcategory_delete')
+    success_url = reverse_lazy('ref_subcategory_list')
 
 
-# Домашняя страница для полей формы
+# -----------------------------
+# Стартовая страница справочников
+# -----------------------------
+
 class RefsHomeView(TemplateView):
+    """Главная страница для выбора справочников."""
     template_name = 'dds/refs_home.html'

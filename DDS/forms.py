@@ -3,16 +3,42 @@ from .models import DDSRecord, Category, SubCategory, Type, Status
 
 
 class DDSRecordForm(forms.ModelForm):
+    """
+    Форма создания/редактирования записи ДДС.
+
+    Особенности:
+    - Автоматически фильтрует и валидирует поля.
+    - Добавляет Bootstrap-классы к полям.
+    - Подсвечивает ошибки через is-invalid.
+    """
     class Meta:
         model = DDSRecord
-        fields = ['created_at', 'status', 'type', 'category', 'subcategory', 'amount', 'comment']
+        fields = [
+            'created_at', 'status', 'type', 'category',
+            'subcategory', 'amount', 'comment'
+        ]
         widgets = {
-            'created_at': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'amount': forms.NumberInput(attrs={'class': 'form-control', 'min': 0, 'step': 1}),
-            'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'created_at': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control'
+            }),
+            'amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 0,
+                'step': 1
+            }),
+            'comment': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 2
+            }),
         }
 
     def __init__(self, *args, **kwargs):
+        """
+        Переопределённый конструктор:
+        - Применяет стили Bootstrap (form-control / form-select)
+        - Добавляет класс is-invalid к ошибочным полям
+        """
         super().__init__(*args, **kwargs)
 
         for name, field in self.fields.items():
@@ -20,7 +46,7 @@ class DDSRecordForm(forms.ModelForm):
             if self.errors.get(name):
                 css_class += ' is-invalid'
 
-            # Для select-ов: заменим на form-select
+            # Для полей типа Select используем класс form-select
             if isinstance(field.widget, forms.Select):
                 css_class = css_class.replace('form-control', 'form-select')
 
@@ -28,20 +54,35 @@ class DDSRecordForm(forms.ModelForm):
 
 
 class TypeForm(forms.ModelForm):
+    """
+    Форма создания/редактирования типа операции.
+    """
     class Meta:
         model = Type
         fields = ['name']
-        widgets = {'name': forms.TextInput(attrs={'class': 'form-control'})}
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'})
+        }
 
 
 class StatusForm(forms.ModelForm):
+    """
+    Форма создания/редактирования статуса операции.
+    """
     class Meta:
         model = Status
         fields = ['name']
-        widgets = {'name': forms.TextInput(attrs={'class': 'form-control'})}
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'})
+        }
 
 
 class CategoryForm(forms.ModelForm):
+    """
+    Форма создания/редактирования категории.
+
+    Связана с моделью Type.
+    """
     class Meta:
         model = Category
         fields = ['name', 'type']
@@ -52,6 +93,11 @@ class CategoryForm(forms.ModelForm):
 
 
 class SubCategoryForm(forms.ModelForm):
+    """
+    Форма создания/редактирования подкатегории.
+
+    Связана с моделью Category.
+    """
     class Meta:
         model = SubCategory
         fields = ['name', 'category']
